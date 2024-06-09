@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div class="min-h-screen bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 flex flex-col items-center p-4">
+  <h1 class="text-3xl font-bold mb-4">Show/Movie Suggestion Bot</h1>
+  <form id="suggestion-form" class="w-full max-w-lg bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md">
+    <div class="mb-4">
+      <label for="recent-watched" class="block text-sm font-medium mb-2">Recently Watched Shows/Movies</label>
+      <textarea id="recent-watched" name="recent_watched" class="w-full p-2 border border-zinc-300 dark:border-zinc-700 rounded-lg" rows="4" placeholder="List your recently watched shows/movies..."></textarea>
+    </div>
+    <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-lg">Get Suggestions</button>
+  </form>
+  <div id="suggestions" class="w-full max-w-lg mt-6"></div>
+</div>
+<script>
+  document.getElementById('suggestion-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    
+    fetch('/get_suggestions', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(suggestions => {
+      const suggestionsDiv = document.getElementById('suggestions');
+      suggestionsDiv.innerHTML = suggestions.map(suggestion => `
+        <div class="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md mb-4 flex">
+          <img src="${suggestion.image}" alt="${suggestion.title}" class="w-24 h-36 object-cover rounded-lg mr-4">
+          <div>
+            <h2 class="text-xl font-bold">${suggestion.title}</h2>
+            <p>${suggestion.description}</p>
+          </div>
+        </div>
+      `).join('');
+    });
+  });
+</script>
+</body>
+</html>
